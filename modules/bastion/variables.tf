@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 variable "aws_region" {
   default = "us-east-1"
 }
@@ -57,3 +58,6 @@ variable "security_group_id" {
 
 
 
+=======
+ 
+>>>>>>> 81b28f79e2a8cba6471480cefc760c93bd289f38

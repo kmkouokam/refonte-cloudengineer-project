@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 data "aws_ssm_parameter" "ubuntu_ami" {
   name = "/aws/service/canonical/ubuntu/server/24.04/stable/current/amd64/hvm/ebs-gp3/ami-id"
@@ -63,3 +64,6 @@ resource "aws_security_group" "bastion_sg" {
     Name = "${var.env}-bastion-sg"
   })
 }
+=======
+ 
+>>>>>>> 81b28f79e2a8cba6471480cefc760c93bd289f38
