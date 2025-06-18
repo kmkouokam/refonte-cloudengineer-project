@@ -23,6 +23,18 @@ resource "aws_instance" "bastion" {
 
   associate_public_ip_address = true
 
+  # iam_instance_profile = var.ec2_instance_profile
+  # depends_on           = [aws_security_group.bastion]
+
+
+  # Example: use secrets in user_data
+  user_data = <<-EOF
+              #!/bin/bash
+               yum install -y aws-cli jq
+              SECRET=$(aws secretsmanager get-secret-value --secret-id mysql-db-credentials --region ${var.aws_region} --query SecretString --output text)
+              echo "Retrieved Secret: $SECRET" >> /tmp/secret.log
+              EOF
+
   tags = merge(var.tags, {
     Name = "${var.env}-bastion"
   })
