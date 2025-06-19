@@ -13,3 +13,10 @@ output "secret_password" {
   sensitive   = true
   description = "The retrieved password from the secret"
 }
+
+output "password" {
+  value       = random_password.password.result
+  description = "Randomly generated password for the secret"
+  sensitive   = true
+}
+

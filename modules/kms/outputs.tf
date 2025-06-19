@@ -13,3 +13,8 @@ output "s3_kms_key_id" {
   description = "KMS key ID for S3 encryption"
 }
 
+
+output "rds_kms_key_arn" {
+  value = aws_kms_key.rds.arn
+}
+

@@ -5,9 +5,15 @@ resource "random_password" "password" {
   override_special = "!@#$%&*()-_=+[]{}<>:?/"
 }
 
+
+locals {
+  secret_suffix     = formatdate("YYYY-MM-DD-HH-mm-ss", timestamp())
+  secret_name_final = "${var.secret_name}-${local.secret_suffix}"
+}
+
 # Create the secret in Secrets Manager
 resource "aws_secretsmanager_secret" "db_secret" {
-  name        = var.secret_name
+  name        = local.secret_name_final
   description = var.description
   kms_key_id  = var.kms_key_id
 
