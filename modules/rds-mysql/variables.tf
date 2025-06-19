@@ -43,3 +43,9 @@ variable "security_group_ids" {
 variable "kms_key_id" {
   type = string
 }
+
+variable "multi_az" {
+  type        = bool
+  description = "Specifies if the RDS instance is multi-AZ"
+
+}
