@@ -49,3 +49,38 @@ resource "aws_lb" "nginx_alb" {
     Name = "${var.env}-nginx-alb"
   }
 }
+
+resource "aws_autoscaling_group" "nginx_asg" {
+  desired_capacity    = var.desired_capacity # must be >= 1
+  max_size            = var.max_size
+  min_size            = var.min_size
+  vpc_zone_identifier = var.public_subnet_ids
+
+  launch_template {
+    id      = aws_launch_template.nginx.id
+    version = "$Latest"
+  }
+
+  target_group_arns = [aws_lb_target_group.nginx_tg.arn]
+  health_check_type = "EC2"
+
+  tag {
+    key                 = "Name"
+    value               = "${var.env}-nginx-asg"
+    propagate_at_launch = true
+  }
+}
+resource "aws_lb_target_group" "nginx_tg" {
+  name     = "${var.env}-nginx-tg"
+  port     = 80
+  protocol = "HTTP"
+  vpc_id   = var.vpc_id
+
+  health_check {
+    path                = "/"
+    interval            = 30
+    timeout             = 5
+    healthy_threshold   = 2
+    unhealthy_threshold = 2
+  }
+}

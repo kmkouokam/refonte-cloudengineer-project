@@ -13,7 +13,7 @@ variable "public_subnet_ids" {
   description = "The public subnet IDs to launch the frontend instances in"
   type        = list(string)
 }
-# variable "vpc_id" { type = string }
+variable "vpc_id" { type = string }
 
 variable "key_name" {
   description = "The SSH key name"
@@ -29,18 +29,18 @@ variable "nginx_security_group_ids" {
   description = "The security group ID for the NGINX instances"
 }
 
-# variable "desired_capacity" {
+variable "desired_capacity" {
 
-#       description = "The desired number of instances in the ASG"
-#       type        = number
-#       }
-# variable "min_size" {
+  description = "The desired number of instances in the ASG"
+  type        = number
+}
+variable "min_size" {
 
-#       description = "The minimum number of instances in the ASG"
-#       type        = number
-#       }
-# variable "max_size" { 
+  description = "The minimum number of instances in the ASG"
+  type        = number
+}
+variable "max_size" {
 
-#      description = "The maximum number of instances in the ASG"
-#      type        = number
-#      }
+  description = "The maximum number of instances in the ASG"
+  type        = number
+}

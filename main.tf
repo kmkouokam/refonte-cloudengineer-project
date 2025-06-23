@@ -288,11 +288,11 @@ module "nginx_frontend" {
 
   elb_security_group_ids   = [aws_security_group.elb_sg.id]
   nginx_security_group_ids = [aws_security_group.nginx_sg.id]
+  vpc_id                   = aws_vpc.main.id
 
-
-  # desired_capacity = 2
-  # min_size         = 1
-  # max_size         = 3
+  desired_capacity = var.desired_capacity
+  min_size         = var.min_size
+  max_size         = var.max_size
 }
 
 
