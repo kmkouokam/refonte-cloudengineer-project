@@ -122,3 +122,12 @@ resource "aws_iam_role_policy" "cloudtrail_logs_policy" {
   role   = aws_iam_role.cloudtrail_logs_role.id
   policy = data.aws_iam_policy_document.cloudtrail_logs.json
 }
+
+
+# ---------------------
+# ece instance profile
+#
+resource "aws_iam_instance_profile" "ec2_instance_profile" {
+  name = "${var.env}-ec2-instance-profile"
+  role = aws_iam_role.ec2_role.name
+}

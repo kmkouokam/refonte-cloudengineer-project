@@ -1,6 +1,8 @@
-<<<<<<< HEAD
+
 variable "aws_region" {
-  default = "us-east-1"
+  description = "AWS region to deploy the bastion host"
+  type        = string
+
 }
 
 variable "bastion_instance_type" {
@@ -8,21 +10,15 @@ variable "bastion_instance_type" {
   type        = string
 }
 
-variable "bastion_instance_id" {
-  description = "The ID of the bastion host instance"
-  type        = string
 
+
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  type        = list(string)
 }
 
-variable "public_subnet_id" {
-  description = "The public subnet ID to launch the bastion host in"
-  type        = string
-}
 
-variable "vpc_id" {
-  description = "The VPC ID for the bastion host"
-  type        = string
-}
+
 
 variable "key_name" {
   description = "The SSH key name"
@@ -44,20 +40,26 @@ variable "env" {
   type        = string
 }
 
-# variable "ec2_instance_profile" {
-#   description = "IAM instance profile name to attach to the EC2 instance"
-#   type        = string
-# }
 
-# variable "secret_name" {}
 
-variable "security_group_id" {
-  description = "Security group ID for the bastion"
+variable "iam_instance_profile_name" {
+  description = "Name of the IAM instance profile to attach"
   type        = string
 }
 
 
 
-=======
- 
->>>>>>> 81b28f79e2a8cba6471480cefc760c93bd289f38
+variable "security_group_ids" {
+  description = "List of Security Group IDs to associate with Bastion"
+  type        = list(string)
+}
+
+
+
+
+
+
+
+
+
+

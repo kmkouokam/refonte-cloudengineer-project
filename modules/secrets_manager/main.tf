@@ -1,8 +1,8 @@
 # Generate a strong random password
 resource "random_password" "password" {
-  length           = 16
-  special          = true
-  override_special = "!@#$%&*()-_=+[]{}<>:?/"
+  length           = 12
+  special          = false
+  override_special = "!#$%&*()-_+{}<>?"
 }
 
 

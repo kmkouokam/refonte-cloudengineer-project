@@ -1,7 +1,8 @@
 variable "env" {
-  default = "Production"
+  default = "production"
 }
 
+## variables.tf vpc
 variable "aws_region" {
   default = "us-east-1"
 }
@@ -31,6 +32,14 @@ variable "private_subnet_cidrs" {
     "10.0.4.0/24",
   ]
 }
+# variable "public_subnet_ids" {
+#   description = "List of public subnet IDs"
+#   type        = list(string)
+# }
+
+# variable "private_subnet_ids" {
+#   type = list(string)
+# }
 
 variable "ipv6_cidr_block" {
   description = "IPv6 CIDR block for inbound rules"
@@ -38,16 +47,65 @@ variable "ipv6_cidr_block" {
   default     = "::/0" # Allow all IPv6 traffic (you can change this)
 }
 
-# variable "bastion_ami" {
-#   description = "AMI ID for the bastion host"
-#   type        = string
-# }
+
+variable "secret_name" {
+  type        = string
+  description = "Name of the secret (e.g., /production/mysql/creds)"
+  default     = "my_secret"
+  validation {
+    condition     = length(var.secret_name) > 0
+    error_message = "The secret_name variable must be a non-empty string."
+  }
+}
+
+variable "description" {
+  type        = string
+  default     = "Managed secret"
+  description = "Description of the secret"
+}
+
+variable "kms_key_id" {
+  type        = string
+  description = "KMS key ID to encrypt the secret"
+  default     = "alias/aws/secretsmanager" # Default to AWS managed key
+  validation {
+    condition     = length(var.kms_key_id) > 0
+    error_message = "The kms_key_id variable must be a non-empty string."
+  }
+}
+
+variable "multi_az" {
+  type        = bool
+  description = "Enable Multi-AZ deployment for RDS"
+
+  default = false
+  validation {
+    condition     = can(var.multi_az)
+    error_message = "The multi_az variable must be a boolean."
+  }
+}
+
+
+
+variable "forntend_instance_type" {
+  description = "The instance type for the frontend"
+  default     = "t2.micro"
+  type        = string
+}
+
+
+
+
+
 
 variable "bastion_instance_type" {
   description = "Instance type for the bastion host"
   type        = string
   default     = "t2.micro"
 }
+
+
+
 
 variable "key_name" {
   description = "Name of the SSH key pair to use for the bastion host"
@@ -62,6 +120,8 @@ variable "allowed_ssh_cidrs" {
 }
 
 
+
+
 variable "tags" {
   description = "values for the tags to be applied to the resources"
   type        = map(string)
@@ -71,4 +131,21 @@ variable "tags" {
     Environment = "Production"
   }
 
+}
+
+
+variable "desired_capacity" {
+  default     = 2
+  description = "The desired number of instances in the ASG"
+  type        = number
+}
+variable "min_size" {
+  default     = 1
+  description = "The minimum number of instances in the ASG"
+  type        = number
+}
+variable "max_size" {
+  default     = 3
+  description = "The maximum number of instances in the ASG"
+  type        = number
 }
