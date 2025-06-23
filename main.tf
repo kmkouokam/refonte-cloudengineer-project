@@ -170,10 +170,15 @@ module "rds_mysql" {
   # db_subnet_group_name = "${var.env}-rds-subnet-group"
 
   private_subnet_ids = aws_subnet.private_subnets[*].id
-  security_group_ids = [aws_security_group.rds_sg.id]
-  kms_key_id         = module.kms.rds_kms_key_arn
+  security_group_ids = [aws_security_group.rds_sg.id,
+    aws_security_group.bastion_sg.id, # Allow access from bastion security group
+    aws_security_group.nginx_sg.id    # Allow access from nginx security group
+
+  ]
+  kms_key_id = module.kms.rds_kms_key_arn
   depends_on = [
     aws_security_group.rds_sg,
+    aws_subnet.private_subnets,
     module.secrets_manager,
     module.kms
   ]
@@ -205,6 +210,7 @@ resource "aws_security_group" "bastion_sg" {
   })
 }
 
+# Call the Bastion module
 module "bastion" {
   source                    = "./modules/bastion"
   bastion_instance_type     = var.bastion_instance_type
@@ -218,8 +224,11 @@ module "bastion" {
   aws_region         = var.aws_region
   depends_on = [
     aws_subnet.public_subnets,
-    aws_security_group.bastion_sg
+    aws_security_group.bastion_sg,
+    module.iam_roles,
+    module.rds_mysql
   ]
+
   tags = merge(var.tags, {
     Name = "${var.env}-bastion"
   })
@@ -277,6 +286,7 @@ resource "aws_security_group" "nginx_sg" {
   }
 }
 
+# Call the NGINX Frontend module
 module "nginx_frontend" {
   source                 = "./modules/nginx_frontend"
   env                    = var.env
@@ -293,6 +303,31 @@ module "nginx_frontend" {
   desired_capacity = var.desired_capacity
   min_size         = var.min_size
   max_size         = var.max_size
+
+  depends_on = [
+    aws_security_group.elb_sg,
+    aws_security_group.nginx_sg,
+    aws_subnet.public_subnets,
+    module.rds_mysql
+  ]
+}
+
+# Call the S3 bucket module
+module "logs_bucket" {
+  source = "./modules/s3_logs"
+  tags   = var.tags
+  env    = var.env
+}
+
+
+# Call the CloudTrail module
+module "cloudtrail" {
+  source         = "./modules/cloudtrail"
+  env            = var.env
+  s3_bucket_name = module.logs_bucket.bucket_name
+  tags           = var.tags
+
+  depends_on = [module.logs_bucket]
 }
 
 
