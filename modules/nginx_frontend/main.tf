@@ -21,6 +21,7 @@ resource "aws_launch_template" "nginx" {
   name_prefix   = "${var.env}-nginx-"
   image_id      = data.aws_ami.ubuntu.id
   instance_type = var.forntend_instance_type
+  key_name      = var.key_name
 
   iam_instance_profile {
     name = var.iam_instance_profile_name
