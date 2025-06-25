@@ -44,3 +44,9 @@ variable "max_size" {
   description = "The maximum number of instances in the ASG"
   type        = number
 }
+
+variable "cloudwatch_agent_role_name" {
+  description = "The name of the IAM role for the CloudWatch agent"
+  type        = string
+
+}

@@ -21,6 +21,25 @@ resource "aws_iam_role_policy_attachment" "ec2_ssm" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMManagedInstanceCore"
 }
 
+# ---------------------
+# CloudWatch Agent Role
+# ---------------------
+
+data "aws_iam_policy_document" "cw_agent_assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+resource "aws_iam_role" "cw_agent_role" {
+  name               = "${var.env}-cw-agent-role"
+  assume_role_policy = data.aws_iam_policy_document.cw_agent_assume.json
+}
+
 resource "aws_iam_role_policy_attachment" "ec2_cw_agent" {
   role       = aws_iam_role.ec2_role.name
   policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
@@ -125,9 +144,17 @@ resource "aws_iam_role_policy" "cloudtrail_logs_policy" {
 
 
 # ---------------------
-# ece instance profile
+# ec2 instance profiles
 #
+
+# For EC2 with SSM access
 resource "aws_iam_instance_profile" "ec2_instance_profile" {
   name = "${var.env}-ec2-instance-profile"
   role = aws_iam_role.ec2_role.name
+}
+
+# For EC2 with CloudWatch Agent
+resource "aws_iam_instance_profile" "cw_agent_instance_profile" {
+  name = "${var.env}-cw-agent-instance-profile"
+  role = aws_iam_role.cw_agent_role.name
 }

@@ -49,3 +49,9 @@ variable "multi_az" {
   description = "Specifies if the RDS instance is multi-AZ"
 
 }
+
+variable "rds_monitoring_role_arn" {
+  description = "The ARN of the IAM role for RDS monitoring"
+  type        = string
+
+}

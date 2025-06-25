@@ -108,7 +108,9 @@ resource "aws_route_table_association" "private_routes" {
 ## modeles/iam_roles/
 module "iam_roles" {
   source = "./modules/iam_roles"
-  env    = var.env
+
+
+  env = var.env
 }
 
 module "kms" {
@@ -176,11 +178,16 @@ module "rds_mysql" {
 
   ]
   kms_key_id = module.kms.rds_kms_key_arn
+
+  rds_monitoring_role_arn = module.iam_roles.rds_monitoring_role_arn
+
   depends_on = [
     aws_security_group.rds_sg,
     aws_subnet.private_subnets,
     module.secrets_manager,
-    module.kms
+    module.kms,
+    aws_security_group.bastion_sg,
+    aws_security_group.nginx_sg
   ]
 
 }
@@ -296,13 +303,13 @@ module "nginx_frontend" {
   iam_instance_profile_name = module.iam_roles.ec2_instance_profile_name
   public_subnet_ids         = aws_subnet.public_subnets[*].id
 
-  elb_security_group_ids   = [aws_security_group.elb_sg.id]
-  nginx_security_group_ids = [aws_security_group.nginx_sg.id]
-  vpc_id                   = aws_vpc.main.id
-
-  desired_capacity = var.desired_capacity
-  min_size         = var.min_size
-  max_size         = var.max_size
+  elb_security_group_ids     = [aws_security_group.elb_sg.id]
+  nginx_security_group_ids   = [aws_security_group.nginx_sg.id]
+  vpc_id                     = aws_vpc.main.id
+  cloudwatch_agent_role_name = module.iam_roles.cloudwatch_agent_role_name
+  desired_capacity           = var.desired_capacity
+  min_size                   = var.min_size
+  max_size                   = var.max_size
 
   depends_on = [
     aws_security_group.elb_sg,
@@ -328,6 +335,23 @@ module "cloudtrail" {
   tags           = var.tags
 
   depends_on = [module.logs_bucket]
+}
+
+# #call cloudwatch module
+module "cloudwatch" {
+  source = "./modules/cloudwatch"
+  env    = var.env
+
+  # frontend_instance_id      = module.nginx_frontend.instance_id
+  # rds_instance_id           = module.rds_mysql.rds_instance_id
+  iam_instance_profile_name     = module.iam_roles.cloudwatch_agent_profile_name
+  rds_instance_name             = module.rds_mysql.rds_instance_name
+  frontend_instance_name        = module.nginx_frontend.frontend_instance_name[*]
+  cloudwatch_agent_role_name    = module.iam_roles.cloudwatch_agent_role_name
+  cloudwatch_agent_profile_name = module.iam_roles.cloudwatch_agent_profile_name
+  aws_region                    = var.aws_region
+
+  depends_on = [module.iam_roles]
 }
 
 

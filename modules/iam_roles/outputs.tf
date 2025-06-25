@@ -18,6 +18,14 @@ output "ec2_instance_profile_name" {
   value = aws_iam_instance_profile.ec2_instance_profile.name
 }
 
+output "cloudwatch_agent_role_name" {
+  value = aws_iam_role.cw_agent_role.name
+}
+
+output "cloudwatch_agent_profile_name" {
+  value = aws_iam_instance_profile.cw_agent_instance_profile.name
+}
+
 
 
 
