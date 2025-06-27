@@ -29,9 +29,11 @@ resource "aws_sns_topic" "alerts" {
 }
 
 resource "aws_sns_topic_subscription" "sns_email" {
+  for_each  = toset(var.notification_emails)
   topic_arn = aws_sns_topic.alerts.arn
   protocol  = "email"
-  endpoint  = "kmkouokam@yahoo.com"
+  endpoint  = each.value
+
 }
 
 ##CloudWatch Alarms for rds
@@ -100,6 +102,19 @@ resource "aws_cloudwatch_metric_alarm" "ec2_high_disk" {
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
+
+resource "aws_cloudwatch_log_group" "waf_metrics" {
+  name              = "aws-waf-logs-${var.env}"
+  retention_in_days = 14
+
+  tags = {
+    Name        = "WAF Log Group"
+    Environment = var.env
+  }
+
+}
+
+data "aws_caller_identity" "current" {}
 
 
 

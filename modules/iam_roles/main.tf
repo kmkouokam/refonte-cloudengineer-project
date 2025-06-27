@@ -142,6 +142,27 @@ resource "aws_iam_role_policy" "cloudtrail_logs_policy" {
   policy = data.aws_iam_policy_document.cloudtrail_logs.json
 }
 
+# ---------------------
+# CloudWatch monitoring role
+#
+
+data "aws_iam_policy_document" "ec2_cloudwatch_permissions" {
+  statement {
+    actions = [
+      "cloudwatch:ListMetrics",
+      "cloudwatch:GetMetricData",
+      "cloudwatch:GetMetricStatistics"
+    ]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_role_policy" "ec2_cloudwatch_metrics" {
+  name   = "${var.env}-cloudwatch-metrics"
+  role   = aws_iam_role.ec2_role.id
+  policy = data.aws_iam_policy_document.ec2_cloudwatch_permissions.json
+}
+
 
 # ---------------------
 # ec2 instance profiles
@@ -157,4 +178,17 @@ resource "aws_iam_instance_profile" "ec2_instance_profile" {
 resource "aws_iam_instance_profile" "cw_agent_instance_profile" {
   name = "${var.env}-cw-agent-instance-profile"
   role = aws_iam_role.cw_agent_role.name
+}
+
+# For EC2 with CloudWatch role
+resource "aws_iam_instance_profile" "ec2_cloudwatch_metrics" {
+  name = "${var.env}-cw-agent-instance-profile-${random_id.cw_agent_suffix.hex}"
+  role = aws_iam_role.cw_agent_role.name
+  depends_on = [
+    aws_iam_role.cw_agent_role
+  ]
+}
+
+resource "random_id" "cw_agent_suffix" {
+  byte_length = 4
 }

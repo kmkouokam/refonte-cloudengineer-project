@@ -26,7 +26,14 @@ output "cloudwatch_agent_profile_name" {
   value = aws_iam_instance_profile.cw_agent_instance_profile.name
 }
 
+output "ec2_cloudwatch_metrics_name" {
+  value = aws_iam_role_policy.ec2_cloudwatch_metrics.name
+}
 
 
+
+# output "waf_logging_bucket" {
+#   value = aws_s3_bucket.waf_logging_bucket.id
+# }
 
 

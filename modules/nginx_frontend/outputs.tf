@@ -7,3 +7,16 @@ output "frontend_instance_name" {
   description = "Name of the EC2 instance running the NGINX frontend"
 
 }
+
+output "nginx_alb_name" {
+  value       = aws_lb.nginx_alb.name
+  description = "Name of the NGINX Application Load Balancer"
+
+}
+
+output "nginx_alb_arn" {
+  description = "The ARN of the Application Load Balancer"
+  value       = aws_lb.nginx_alb.arn
+}
+
+

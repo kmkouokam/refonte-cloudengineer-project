@@ -30,17 +30,16 @@ resource "aws_launch_template" "nginx" {
   vpc_security_group_ids = var.nginx_security_group_ids
 
 
-  user_data = base64encode(<<EOF
-#!/bin/bash
-sudo apt update -y
-sudo apt install nginx -y
-sudo systemctl enable nginx
-sudo systemctl start nginx
-sudo apt install -y amazon-cloudwatch-agent
-  /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
-    -a fetch-config -m ec2 -c ssm:AmazonCloudWatch-linux -s 
-EOF
+  user_data = base64encode(<<-EOF
+    #!/bin/bash
+    cd /tmp
+    wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
+    dpkg -i -E ./amazon-cloudwatch-agent.deb
+  EOF
   )
+
+
+
 }
 
 resource "aws_lb" "nginx_alb" {

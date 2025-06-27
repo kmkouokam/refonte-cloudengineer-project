@@ -1,14 +1,9 @@
 # # 
-# variable "frontend_instance_id" {
-#   description = "The ID of the EC2 instance running the frontend application"
-#   type        = string
-
-# }
-
-# variable "rds_instance_id" {
-#   description = "The ID of the RDS instance"
-#   type        = string
-# }
+# This file contains the variables used in the CloudWatch module for Terraform.
+variable "aws_region" {
+  description = "The AWS region where resources will be created"
+  type        = string
+}
 
 variable "env" {
   description = "The environment name (e.g., dev, prod)"
@@ -32,11 +27,6 @@ variable "cloudwatch_agent_profile_name" {
   type        = string
 }
 
-variable "aws_region" {
-  description = "The AWS region where resources will be created"
-  type        = string
-
-}
 
 variable "rds_instance_name" {
   description = "The name of the RDS instance"
@@ -47,3 +37,13 @@ variable "frontend_instance_name" {
   description = "The name of the EC2 instance running the frontend application"
   type        = list(string)
 }
+
+variable "notification_emails" {
+  type    = list(string)
+  default = ["nycarine0@gmail.com", "kmkouokam@yahoo.com"]
+}
+
+# variable "ec2_cloudwatch_metrics_name" {
+#   description = "The name of the IAM role policy for EC2 CloudWatch metrics"
+#   type        = string
+# }
