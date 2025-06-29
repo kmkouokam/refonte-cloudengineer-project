@@ -15,10 +15,7 @@ variable "tags" {
   default     = {}
 }
 
-# variable "waf_logging_role_arn" {
-#   description = "ARN of the IAM role for WAF logging"
-#   type        = string
-# }
+
 
 variable "waf_logging_group_arn" {
   description = "ARN of the CloudWatch log group for WAF logging"
@@ -26,24 +23,15 @@ variable "waf_logging_group_arn" {
 }
 
 
-# variable "waf_logging_bucket" {
-#   description = "Name of the S3 bucket for WAF logging"
-#   type        = string
-# }
+
 
 variable "nginx_alb_arn" {
   description = "ARN of the NGINX ALB"
   type        = string
 }
 
-# variable "waf_logging_group_name" {
-#   description = "Name of the CloudWatch log group for WAF logging"
-#   type        = string
+variable "waf_logging_role_arn" {
+  description = "ARN of the IAM role for WAF logging"
+  type        = string
+}
 
-
-# }
-
-# variable "nginx_alb_name" {
-#   description = "The NGINX Application Load Balancer resource name"
-#   type        = any
-# }
