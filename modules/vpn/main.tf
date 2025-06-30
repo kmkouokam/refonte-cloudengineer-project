@@ -8,6 +8,11 @@ data "aws_acm_certificate" "devopsguru_cert" {
 }
 
 
+data "aws_vpc" "main" {
+  # Assuming the VPC is already created and you have its ID
+  id = var.vpc_id
+}
+
 data "aws_subnet" "public" {
   for_each = toset(var.public_subnet_ids)
   id       = each.value
@@ -20,21 +25,19 @@ data "aws_subnet" "private" {
 
 
 
-locals {
-  unique_public_az_subnets = {
-    for subnet_id, subnet in data.aws_subnet.public :
-    subnet.availability_zone => subnet.id...
-  }
+# locals {
+#   public_az_subnets = {
+#     for id, subnet in data.aws_subnet.public :
+#     subnet.availability_zone => subnet
+#     if !contains(keys({ for az, _ in data.aws_subnet.public : az => true }), subnet.availability_zone)
+#   }
 
-  unique_private_az_subnets = {
-    for subnet_id, subnet in data.aws_subnet.private :
-    subnet.availability_zone => subnet.id...
-  }
-
-  # Only keep one subnet per AZ
-  public_vpn_subnets  = { for az, ids in local.unique_public_az_subnets : az => ids[0] }
-  private_vpn_subnets = { for az, ids in local.unique_private_az_subnets : az => ids[0] }
-}
+#   private_az_subnets = {
+#     for id, subnet in data.aws_subnet.private :
+#     subnet.availability_zone => subnet
+#     if !contains(keys({ for az, _ in data.aws_subnet.private : az => true }), subnet.availability_zone)
+#   }
+# }
 
 
 
@@ -61,28 +64,43 @@ resource "aws_ec2_client_vpn_endpoint" "vpn_endpoint" {
 
 # Attach VPN to public subnets
 resource "aws_ec2_client_vpn_network_association" "public" {
-  for_each               = local.public_vpn_subnets
+  for_each               = data.aws_subnet.public
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_endpoint.id
-  subnet_id              = each.value
+  subnet_id              = each.value.id
+  depends_on             = [data.aws_vpc.main]
 }
 
 # Attach VPN to private subnets
 resource "aws_ec2_client_vpn_network_association" "private" {
-  for_each               = local.private_vpn_subnets
+  for_each               = data.aws_subnet.private
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_endpoint.id
-  subnet_id              = each.value
+  subnet_id              = each.value.id
+  depends_on             = [data.aws_vpc.main]
 }
 
 
 # Route VPN traffic to all subnets
-resource "aws_ec2_client_vpn_route" "vpn_routes" {
-  for_each               = toset(concat(var.public_subnet_ids, var.private_subnet_ids))
+resource "aws_ec2_client_vpn_route" "vpn_routes_public" {
+  for_each               = data.aws_subnet.public
   client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_endpoint.id
   destination_cidr_block = "0.0.0.0/0"
-  target_vpc_subnet_id   = each.value
+  target_vpc_subnet_id   = each.key
 
   depends_on = [
     aws_ec2_client_vpn_network_association.public,
+    data.aws_vpc.main
+
+  ]
+}
+
+resource "aws_ec2_client_vpn_route" "vpn_routes_private" {
+  for_each               = data.aws_subnet.private
+  client_vpn_endpoint_id = aws_ec2_client_vpn_endpoint.vpn_endpoint.id
+  destination_cidr_block = "0.0.0.0/0"
+  target_vpc_subnet_id   = each.key
+
+  depends_on = [
+    data.aws_vpc.main,
     aws_ec2_client_vpn_network_association.private
   ]
 }
