@@ -65,7 +65,7 @@
 # }
 
 # resource "aws_budgets_budget" "monthly_budget" {
-#   name         = "monthly-project-budget"
+#   name_prefix         = "monthly-project-budget"
 #   budget_type  = "COST"
 #   limit_amount = var.budget_amount
 #   limit_unit   = "USD"
