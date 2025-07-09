@@ -38,6 +38,7 @@ resource "aws_sns_topic_subscription" "sns_email" {
 
 ##CloudWatch Alarms for rds
 resource "aws_cloudwatch_metric_alarm" "rds_high_cpu" {
+  for_each            = var.rds_instance_names
   alarm_name          = "${var.env}-rds-high-cpu"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -48,11 +49,12 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_cpu" {
   threshold           = 70
   alarm_description   = "This metric monitors high CPU utilization on RDS"
   dimensions = {
-    DBInstanceIdentifier = var.rds_instance_name
+    DBInstanceIdentifier = each.value
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
 resource "aws_cloudwatch_metric_alarm" "rds_high_memory" {
+  for_each            = var.rds_instance_names
   alarm_name          = "${var.env}-rds-high-memory"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods  = 2
@@ -63,7 +65,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_memory" {
   threshold           = 1000000000
   alarm_description   = "This metric monitors low freeable memory on RDS"
   dimensions = {
-    DBInstanceIdentifier = var.rds_instance_name
+    DBInstanceIdentifier = each.value
   }
   alarm_actions = [aws_sns_topic.alerts.arn]
 }
