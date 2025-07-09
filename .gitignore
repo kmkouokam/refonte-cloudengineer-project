@@ -1,6 +1,7 @@
 # Local .terraform directories (state management, plugins, etc.)
 **/.terraform/
 .terraform.lock.hcl
+*.tfstate*
 
 # Terraform state files (often contain sensitive info)
 terraform.tfstate
