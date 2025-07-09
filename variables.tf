@@ -32,14 +32,17 @@ variable "private_subnet_cidrs" {
     "10.0.4.0/24",
   ]
 }
-# variable "public_subnet_ids" {
-#   description = "List of public subnet IDs"
-#   type        = list(string)
-# }
+variable "public_subnet_ids" {
+  description = "List of public subnet IDs"
+  type        = set(string)
+  default     = []
+}
 
-# variable "private_subnet_ids" {
-#   type = list(string)
-# }
+variable "private_subnet_ids" {
+  description = "List of private subnet IDs"
+  type        = set(string)
+  default     = []
+}
 
 variable "ipv6_cidr_block" {
   description = "IPv6 CIDR block for inbound rules"
@@ -47,6 +50,90 @@ variable "ipv6_cidr_block" {
   default     = "::/0" # Allow all IPv6 traffic (you can change this)
 }
 
+variable "peer_aws_region" {
+  description = "AWS region for peer resources"
+  type        = string
+  default     = "us-east-2"
+  validation {
+    condition     = can(regex("^[a-z]{2}-[a-z]+-[1-9]$", var.peer_aws_region))
+    error_message = "The peer_aws_region variable must be a valid AWS region."
+  }
+}
+
+variable "peer_vpc_cidr" {
+  description = "CIDR block for the peer VPC"
+  type        = string
+  default     = "10.1.0.0/16"
+}
+variable "peer_public_subnet_cidrs" {
+  description = "List of CIDRs for public subnets in the peer VPC"
+  type        = list(string)
+  default = [
+    "10.1.1.0/24",
+    "10.1.2.0/24"
+  ]
+}
+
+variable "peer_private_subnet_cidrs" {
+  description = "List of CIDRs for private subnets in the peer VPC"
+  type        = list(string)
+  default = [
+    "10.1.3.0/24",
+    "10.1.4.0/24"
+  ]
+}
+
+variable "peer_public_subnet_ids" {
+  description = "List of public subnet IDs in the peer VPC"
+  type        = list(string)
+  default = [
+    "10.1.1.0/24",
+    "10.1.2.0/24"
+  ]
+}
+
+
+variable "peer_private_subnet_ids" {
+  description = "List of private subnet IDs in the peer VPC"
+  type        = list(string)
+  default = [
+    "10.1.3.0/24",
+    "10.1.4.0/24"
+  ]
+}
+
+variable "aws_vpc_peering_connection_id" {
+  description = "VPC peering connection for the peer VPC"
+  type        = string
+  default     = ""
+}
+
+variable "auto_accept" {
+  type    = bool
+  default = false
+}
+
+
+variable "public_route_table_ids" {
+  description = "List of public route table IDs"
+  type        = list(string)
+  default     = []
+}
+variable "private_route_table_ids" {
+  description = "List of private route table IDs"
+  type        = list(string)
+  default     = []
+}
+variable "peer_public_route_table_ids" {
+  description = "List of public route table IDs in the peer VPC"
+  type        = list(string)
+  default     = []
+}
+variable "peer_private_route_table_ids" {
+  description = "List of private route table IDs in the peer VPC"
+  type        = list(string)
+  default     = []
+}
 
 variable "secret_name" {
   type        = string
@@ -57,6 +144,24 @@ variable "secret_name" {
     error_message = "The secret_name variable must be a non-empty string."
   }
 }
+
+
+
+
+# variable "rds_instances" {
+#   description = "Map of RDS instance configs. Keys are used as instance suffixes."
+#   type = map(object({
+#     db_name     = string
+#     db_username = string
+#     db_password = string
+#     # private_subnet_ids = list(string)
+#     az_index = number
+#   }))
+# }
+
+
+
+
 
 variable "description" {
   type        = string
@@ -149,3 +254,5 @@ variable "max_size" {
   description = "The maximum number of instances in the ASG"
   type        = number
 }
+
+
