@@ -1,40 +1,50 @@
 ## CloudWatch Dashboard
 resource "aws_cloudwatch_dashboard" "main" {
-  dashboard_name = "${var.env}-dashboard"
+  dashboard_name = "${var.env}-ec2-cleanup-dashboard"
+
   dashboard_body = jsonencode({
     widgets = [
       {
-        type   = "metric",
-        x      = 0,
-        y      = 0,
-        width  = 12,
-        height = 6,
-        properties = {
-          metrics = [
-            ["AWS/EC2", "CPUUtilization", "InstanceId", "i-xxxxxxx"]
+        "type" : "metric",
+        "x" : 0,
+        "y" : 0,
+        "width" : 12,
+        "height" : 6,
+        "properties" : {
+          "metrics" : [
+            ["EC2Cleanup", "DeletedVolumes"],
+            ["EC2Cleanup", "ReleasedEIPs"]
           ],
-          period = 300,
-          stat   = "Average",
-          region = var.aws_region,
-          title  = "EC2 CPU Utilization"
+          "period" : 86400,
+          "stat" : "Sum",
+          "region" : var.aws_region,
+          "title" : "EC2 Cleanup Metrics"
+        }
+      },
+      {
+        "type" : "metric",
+        "x" : 12,
+        "y" : 0,
+        "width" : 12,
+        "height" : 6,
+        "properties" : {
+          "metrics" : [
+            ["AWS/Lambda", "Invocations", "FunctionName", var.lambda_function_name],
+            ["AWS/Lambda", "Errors", "FunctionName", var.lambda_function_name],
+            ["AWS/Lambda", "Duration", "FunctionName", var.lambda_function_name]
+          ],
+          "view" : "timeSeries",
+          "region" : var.aws_region,
+          "stat" : "Sum",
+          "title" : "Lambda Execution Stats"
         }
       }
     ]
   })
 }
 
-##SNS Topic for Alarms
-resource "aws_sns_topic" "alerts" {
-  name = "${var.env}-cloudwatch-alerts"
-}
 
-resource "aws_sns_topic_subscription" "sns_email" {
-  for_each  = toset(var.notification_emails)
-  topic_arn = aws_sns_topic.alerts.arn
-  protocol  = "email"
-  endpoint  = each.value
 
-}
 
 ##CloudWatch Alarms for rds
 resource "aws_cloudwatch_metric_alarm" "rds_high_cpu" {
@@ -51,7 +61,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_cpu" {
   dimensions = {
     DBInstanceIdentifier = each.value
   }
-  alarm_actions = [aws_sns_topic.alerts.arn]
+  alarm_actions = [var.aws_sns_topic_arn]
 }
 resource "aws_cloudwatch_metric_alarm" "rds_high_memory" {
   for_each            = var.rds_instance_names
@@ -67,7 +77,7 @@ resource "aws_cloudwatch_metric_alarm" "rds_high_memory" {
   dimensions = {
     DBInstanceIdentifier = each.value
   }
-  alarm_actions = [aws_sns_topic.alerts.arn]
+  alarm_actions = [var.aws_sns_topic_arn]
 }
 
 ##CloudWatch Alarms for EC2 frondend
@@ -85,7 +95,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_high_cpu" {
   dimensions = {
     InstanceId = element(var.frontend_instance_name, count.index + 1) # Replace with your actual instance name
   }
-  alarm_actions = [aws_sns_topic.alerts.arn]
+  alarm_actions = [var.aws_sns_topic_arn]
 }
 
 resource "aws_cloudwatch_metric_alarm" "ec2_high_disk" {
@@ -102,7 +112,7 @@ resource "aws_cloudwatch_metric_alarm" "ec2_high_disk" {
   dimensions = {
     InstanceId = element(var.frontend_instance_name, count.index + 1) # Replace with your actual instance name
   }
-  alarm_actions = [aws_sns_topic.alerts.arn]
+  alarm_actions = [var.aws_sns_topic_arn]
 }
 
 resource "aws_cloudwatch_log_group" "waf_metrics" {

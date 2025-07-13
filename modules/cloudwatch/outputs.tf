@@ -1,6 +1,4 @@
-# output "waf_logging_group_arn" {
-#   value = aws_cloudwatch_log_group.waf_metrics.arn
-# }
+
 
 # modules/cloudwatch/outputs.tf
 output "waf_logging_group_arn" {

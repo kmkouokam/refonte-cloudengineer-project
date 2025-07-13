@@ -110,3 +110,8 @@ output "peer_private_route_table_ids" {
   value       = aws_route_table.peer_private_subnets[*].id
 }
 
+output "aws_sns_topic_alerts_arn" {
+  description = "ARN of the SNS topic for alerts"
+  value       = aws_sns_topic.alerts.arn
+
+}

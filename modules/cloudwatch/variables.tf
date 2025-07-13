@@ -27,28 +27,27 @@ variable "cloudwatch_agent_profile_name" {
   type        = string
 }
 
+variable "lambda_function_name" {
+  description = "The name of the Lambda function for cleanup"
+  type        = string
 
-# variable "rds_instance_name" {
-#   description = "The name of the RDS instance"
-#   type        = string
-# }
+}
+
+
+
 
 variable "frontend_instance_name" {
   description = "The name of the EC2 instance running the frontend application"
   type        = list(string)
 }
 
-variable "notification_emails" {
-  type    = list(string)
-  default = ["nycarine0@gmail.com", "kmkouokam@yahoo.com"]
-}
 
 
 variable "rds_instance_names" {
   type = map(string)
 }
 
-# variable "ec2_cloudwatch_metrics_name" {
-#   description = "The name of the IAM role policy for EC2 CloudWatch metrics"
-#   type        = string
-# }
+variable "aws_sns_topic_arn" {
+  description = "ARN of the SNS topic for alerts"
+  type        = string
+}

@@ -145,19 +145,13 @@ variable "secret_name" {
   }
 }
 
+variable "notification_emails" {
+  type    = list(string)
+  default = ["nycarine0@gmail.com", "kmkouokam@yahoo.com"]
+}
 
 
 
-# variable "rds_instances" {
-#   description = "Map of RDS instance configs. Keys are used as instance suffixes."
-#   type = map(object({
-#     db_name     = string
-#     db_username = string
-#     db_password = string
-#     # private_subnet_ids = list(string)
-#     az_index = number
-#   }))
-# }
 
 
 

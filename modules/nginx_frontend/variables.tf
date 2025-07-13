@@ -51,4 +51,8 @@ variable "cloudwatch_agent_role_name" {
 
 }
 
+variable "xray_instance_profile_name" {
+  description = "The name of the IAM instance profile for X-Ray"
+  type        = string
 
+}

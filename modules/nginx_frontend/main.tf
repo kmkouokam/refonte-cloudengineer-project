@@ -27,11 +27,16 @@ resource "aws_launch_template" "nginx" {
     name = var.iam_instance_profile_name
   }
 
+
   vpc_security_group_ids = var.nginx_security_group_ids
 
 
   user_data = base64encode(<<-EOF
     #!/bin/bash
+    apt-get update -y
+    apt install -y aws-xray-daemon
+    systemctl enable aws-xray-daemon
+    systemctl start aws-xray-daemon
     cd /tmp
     wget https://s3.amazonaws.com/amazoncloudwatch-agent/ubuntu/amd64/latest/amazon-cloudwatch-agent.deb
     dpkg -i -E ./amazon-cloudwatch-agent.deb

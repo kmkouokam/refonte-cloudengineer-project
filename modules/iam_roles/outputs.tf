@@ -30,6 +30,9 @@ output "ec2_cloudwatch_metrics_name" {
   value = aws_iam_role_policy.ec2_cloudwatch_metrics.name
 }
 
+output "xray_instance_profile_name" {
+  value = aws_iam_instance_profile.xray_instance_profile.name
+}
 
 
 # output "waf_logging_bucket" {

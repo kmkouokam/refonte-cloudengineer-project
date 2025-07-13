@@ -459,8 +459,9 @@ module "nginx_frontend" {
   key_name               = var.key_name
   forntend_instance_type = var.forntend_instance_type
 
-  iam_instance_profile_name = module.iam_roles.ec2_instance_profile_name
-  public_subnet_ids         = aws_subnet.public_subnets[*].id
+  iam_instance_profile_name  = module.iam_roles.ec2_instance_profile_name
+  xray_instance_profile_name = module.iam_roles.xray_instance_profile_name
+  public_subnet_ids          = aws_subnet.public_subnets[*].id
 
   elb_security_group_ids     = [aws_security_group.elb_sg.id]
   nginx_security_group_ids   = [aws_security_group.nginx_sg.id]
@@ -496,20 +497,35 @@ module "cloudtrail" {
   depends_on = [module.logs_bucket]
 }
 
+
+##SNS Topic for Alarms
+resource "aws_sns_topic" "alerts" {
+  name = "${var.env}-cloudwatch-alerts"
+}
+
+resource "aws_sns_topic_subscription" "sns_email" {
+  for_each  = toset(var.notification_emails)
+  topic_arn = aws_sns_topic.alerts.arn
+  protocol  = "email"
+  endpoint  = each.value
+
+}
+
 # #call cloudwatch module
 module "cloudwatch" {
   source = "./modules/cloudwatch"
   env    = var.env
 
-  # frontend_instance_id      = module.nginx_frontend.instance_id
-  # rds_instance_id           = module.rds_mysql.rds_instance_id
+  aws_sns_topic_arn         = aws_sns_topic.alerts.arn
   iam_instance_profile_name = module.iam_roles.cloudwatch_agent_profile_name
   rds_instance_names        = module.rds_mysql.rds_instance_identifiers # Map of RDS instance names
 
   frontend_instance_name        = module.nginx_frontend.frontend_instance_name[*]
   cloudwatch_agent_role_name    = module.iam_roles.cloudwatch_agent_role_name
   cloudwatch_agent_profile_name = module.iam_roles.cloudwatch_agent_profile_name
-  aws_region                    = var.aws_region
+  lambda_function_name          = module.lambda_cleanup.lambda_function_name
+
+  aws_region = var.aws_region
 
   depends_on = [module.iam_roles]
 }
@@ -626,3 +642,18 @@ module "vpc_peering" {
   ]
 
 }
+
+
+module "lambda_cleanup" {
+  source            = "./modules/lambda_cleanup"
+  env               = var.env
+  aws_sns_topic_arn = aws_sns_topic.alerts.arn
+
+
+
+}
+
+
+
+
+

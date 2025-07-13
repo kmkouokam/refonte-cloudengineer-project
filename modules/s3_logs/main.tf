@@ -1,10 +1,43 @@
 resource "aws_s3_bucket" "logs" {
-  bucket = "refonte-aws-logs-bucket-${var.env}"
-
+  bucket        = "refonte-aws-logs-bucket-${var.env}"
   force_destroy = true
-
-  tags = var.tags
+  tags          = var.tags
 }
+
+# ✅ Enable versioning
+resource "aws_s3_bucket_versioning" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+# ✅ Lifecycle rule to expire non-current (versioned) objects after 30 days
+resource "aws_s3_bucket_lifecycle_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    id     = "expire-old-versions"
+    status = "Enabled"
+
+    filter {
+      prefix = "AWSLogs/${data.aws_caller_identity.current.account_id}/"
+    }
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+
+    expiration {
+      days = 365 # delete current objects older than 1 year (optional)
+    }
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+  }
+}
+
 
 resource "aws_s3_bucket_policy" "cloudtrail_logs" {
   bucket = aws_s3_bucket.logs.id
