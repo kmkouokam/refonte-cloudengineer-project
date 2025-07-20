@@ -2,6 +2,13 @@ import json
 import boto3
 import datetime
 import logging
+import os
+import pymysql
+from aws_xray_sdk.core import xray_recorder, patch_all
+from aws_xray_sdk.core import patch
+
+# Patch all boto3 and pymysql calls
+patch_all()
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -80,6 +87,29 @@ def lambda_handler(event, context):
         Message=message
     )
     logger.info("Cleanup completed and notification sent.")
+
+      # --- MySQL Query with X-Ray Tracing ---
+    try:
+        xray_recorder.begin_subsegment('MySQLConnection')
+        conn = pymysql.connect(
+            host=os.environ['DB_HOST'],
+            user=os.environ['DB_USER'],
+            password=os.environ['DB_PASSWORD'],
+            db=os.environ['DB_NAME'],
+            connect_timeout=5
+        )
+        xray_recorder.end_subsegment()
+
+        with conn.cursor() as cursor:
+            xray_recorder.begin_subsegment('Query: SELECT NOW()')
+            cursor.execute("SELECT NOW()")
+            result = cursor.fetchone()
+            xray_recorder.end_subsegment()
+        
+        logger.info(f"MySQL Query Result: {result[0]}")
+    except Exception as e:
+        logger.error(f"MySQL connection/query failed: {str(e)}")
+
     
     return {
         'statusCode': 200,

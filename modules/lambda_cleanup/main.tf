@@ -41,7 +41,8 @@ resource "aws_iam_policy" "lambda_cleanup_policy" {
       },
       {
         Effect   = "Allow",
-        Resource = "*"
+        Action   = "sns:Publish",
+        Resource = var.aws_sns_topic_arn
       }
     ]
   })

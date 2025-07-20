@@ -155,6 +155,16 @@ data "aws_iam_policy_document" "ec2_cloudwatch_permissions" {
     ]
     resources = ["*"]
   }
+  statement {
+    actions = [
+      "xray:PutTraceSegments",
+      "xray:PutTelemetryRecords",
+      "xray:GetSamplingRules"
+    ]
+    resources = ["*"]
+  }
+
+
 }
 
 resource "aws_iam_role_policy" "ec2_cloudwatch_metrics" {
@@ -164,6 +174,11 @@ resource "aws_iam_role_policy" "ec2_cloudwatch_metrics" {
 }
 
 
+
+resource "aws_iam_role_policy_attachment" "ec2_cloudwatch" {
+  role       = aws_iam_role.ec2_role.name
+  policy_arn = "arn:aws:iam::aws:policy/CloudWatchAgentServerPolicy"
+}
 
 # ---------------------
 # x-ray ec2 role

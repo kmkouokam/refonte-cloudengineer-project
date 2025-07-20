@@ -251,7 +251,7 @@ resource "aws_security_group" "rds_sg" {
     from_port   = 3306
     to_port     = 3306
     protocol    = "tcp"
-    cidr_blocks = var.private_subnet_cidrs # Allow access from private subnets
+    cidr_blocks = ["0.0.0.0/0"] # Allow access from private subnets
   }
 
   egress {
@@ -279,7 +279,7 @@ module "rds_mysql" {
   instance_class          = "db.t3.micro"
   storage_size            = 20
   kms_key_id              = module.kms.rds_kms_key_arn
-  security_group_ids      = [aws_security_group.rds_sg.id]
+  security_group_ids      = [aws_security_group.rds_sg.id, aws_security_group.jenkins_sg.id, aws_security_group.bastion_sg.id, aws_security_group.nginx_sg.id]
   rds_monitoring_role_arn = [module.iam_roles.rds_monitoring_role_arn]
   rds_instances = {
     "mysql-a" = {
@@ -304,6 +304,7 @@ module "rds_mysql" {
     aws_security_group.rds_sg,
     aws_security_group.bastion_sg,
     aws_security_group.nginx_sg,
+    aws_security_group.jenkins_sg,
     aws_subnet.private_subnets,
     module.secrets_manager,
     module.kms,
@@ -480,10 +481,11 @@ module "nginx_frontend" {
 }
 
 # Call the S3 bucket module
-module "logs_bucket" {
-  source = "./modules/s3_logs"
-  tags   = var.tags
-  env    = var.env
+module "s3_logs_bucket" {
+  source      = "./modules/s3_logs"
+  bucket_name = "refonte-jenkins-artifacts-2025${var.env}"
+  tags        = var.tags
+  env         = var.env
 }
 
 
@@ -491,10 +493,10 @@ module "logs_bucket" {
 module "cloudtrail" {
   source         = "./modules/cloudtrail"
   env            = var.env
-  s3_bucket_name = module.logs_bucket.bucket_name
+  s3_bucket_name = module.s3_logs_bucket.bucket_name
   tags           = var.tags
 
-  depends_on = [module.logs_bucket]
+  depends_on = [module.s3_logs_bucket]
 }
 
 
@@ -653,7 +655,45 @@ module "lambda_cleanup" {
 
 }
 
+resource "aws_security_group" "jenkins_sg" {
+  name        = "jenkins-sg"
+  description = "Allow HTTP for Jenkins UI"
+  vpc_id      = aws_vpc.main.id
 
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"] # for testing only, restrict in prod
+  }
 
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
+# Call the Jenkins module
+# This module sets up Jenkins on EC2 instances in the specified public subnets
 
+module "jenkins" {
+  source             = "./modules/jenkins"
+  env                = var.env
+  instance_type      = var.jenkins_instance_type
+  public_subnet_ids  = aws_subnet.public_subnets[*].id
+  key_name           = var.key_name
+  bucket_name        = var.bucket_name
+  security_group_ids = [aws_security_group.jenkins_sg.id]
+
+  # vpc_id = aws_vpc.main.id
+  depends_on = [
+    aws_security_group.jenkins_sg,
+    aws_subnet.public_subnets,
+
+    module.rds_mysql,
+    module.s3_logs_bucket
+  ]
+
+}

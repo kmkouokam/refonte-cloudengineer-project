@@ -1,10 +1,9 @@
 #!/bin/bash
 # Update system packages
-apt update -y
-apt
+sudo apt upgrade && update -y
 
 # Install MySQL client
-apt install -ymysql-client
+sudo apt install mysql-client -y
 
 # Optional: confirm installation
 mysql --version

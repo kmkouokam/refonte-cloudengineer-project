@@ -250,3 +250,24 @@ variable "max_size" {
 }
 
 
+
+
+
+
+
+variable "jenkins_instance_type" {
+  description = "The instance type for the Jenkins EC2 instance"
+  type        = string
+  default     = "t2.micro"
+}
+
+variable "bucket_name" {
+  description = "The name of the S3 bucket for Jenkins logs"
+  type        = string
+  default     = "refonte-training-bucket-2025-01-01" # Change this to a unique bucket name
+  validation {
+    condition     = can(regex("^[a-z0-9.-]{3,63}$", var.bucket_name))
+    error_message = "The bucket_name must be a valid S3 bucket name."
+  }
+
+}

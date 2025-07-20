@@ -21,6 +21,11 @@ output "secret_name" {
 
 }
 
+output "jenkins_security_group" {
+  description = "Security group for Jenkins"
+  value       = aws_security_group.jenkins_sg.id
+}
+
 
 
 

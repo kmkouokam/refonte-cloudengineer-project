@@ -25,7 +25,7 @@ resource "aws_instance" "bastion" {
   iam_instance_profile        = var.iam_instance_profile_name
   associate_public_ip_address = true
 
-  user_data = file("${path.module}/user_data.sh")
+  user_data = filebase64("${path.module}/user_data.sh")
 
   tags = {
     Name        = "${var.env}-bastion"
