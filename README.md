@@ -36,7 +36,7 @@ root/
 
 | Module Name        | Description |
 |--------------------|-------------|
-| **bastion**        | Provisions a bastion host with a secure SSH setup using user data. 
+| **bastion**        | Provision a bastion host with a secure SSH setup using user data. 
 | **cloudtrail**     | Enables AWS CloudTrail for governance, compliance, and auditing. 
 | **cloudwatch**     | Sets up monitoring, alarms, logs, and dashboards for key services. 
 | **cost_optimization** | Defines policies and recommendations for cost-effective resource usage. 
@@ -44,7 +44,6 @@ root/
 | **jenkins**        | Installs Jenkins on an EC2 instance for CI/CD orchestration. |
 | **kms**            | Configures AWS Key Management Service (KMS) keys for encryption. |
 | **lambda_cleanup** | Deploys a Lambda function to clean up unused resources automatically. |
-| **load-balancer**  | (Missing detail) Expected to define an Application Load Balancer (ALB). |
 | **nginx_frontend** | Launches an EC2 instance running Nginx to serve the frontend app. |
 | **rds-mysql**      | Deploys an RDS MySQL database in a multi-AZ setup with enhanced security. |
 | **s3_logs**        | Creates S3 buckets to store logs (e.g., from CloudTrail, ALB, etc.). |
