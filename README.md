@@ -21,7 +21,6 @@ root/
     ├── jenkins/           # IAM + EC2 Jenkins setup
     ├── kms/               # KMS encryption setup
     ├── lambda_cleanup/    # Python Lambda to clean up EIPs, volumes
-    ├── load-balancer/     # Load Balancer config
     ├── nginx_frontend/    # Auto-scaled NGINX frontend
     ├── rds-mysql/         # Multi-AZ RDS MySQL
     ├── s3_logs/           # S3 logging bucket
