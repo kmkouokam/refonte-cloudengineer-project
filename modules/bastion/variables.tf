@@ -11,13 +11,10 @@ variable "bastion_instance_type" {
 }
 
 
-
 variable "public_subnet_ids" {
   description = "List of public subnet IDs"
   type        = list(string)
 }
-
-
 
 
 variable "key_name" {
@@ -41,12 +38,10 @@ variable "env" {
 }
 
 
-
 variable "iam_instance_profile_name" {
   description = "Name of the IAM instance profile to attach"
   type        = string
 }
-
 
 
 variable "security_group_ids" {

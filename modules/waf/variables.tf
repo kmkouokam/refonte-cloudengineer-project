@@ -16,13 +16,10 @@ variable "tags" {
 }
 
 
-
 variable "waf_logging_group_arn" {
   description = "ARN of the CloudWatch log group for WAF logging"
   type        = string
 }
-
-
 
 
 variable "nginx_alb_arn" {

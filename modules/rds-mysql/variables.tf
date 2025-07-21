@@ -3,8 +3,6 @@ variable "env" {
 }
 
 
-
-
 variable "rds_instances" {
   description = "Map of RDS instance configs. Keys are used as instance suffixes."
   type = map(object({
@@ -16,14 +14,6 @@ variable "rds_instances" {
   }))
 }
 
-# variable "db_username" {
-#   type = string
-# }
-
-# variable "db_password" {
-#   type      = string
-#   sensitive = true
-# }
 
 variable "instance_class" {
   type    = string
@@ -40,11 +30,6 @@ variable "storage_size" {
   default = 20
 }
 
-# variable "private_subnet_ids" {
-#   type        = list(string)
-#   description = "Private subnet IDs for RDS"
-# }
-
 
 variable "security_group_ids" {
   type = list(string)
@@ -54,11 +39,6 @@ variable "kms_key_id" {
   type = string
 }
 
-# variable "multi_az" {
-#   type        = bool
-#   description = "Specifies if the RDS instance is multi-AZ"
-
-# }
 
 variable "rds_monitoring_role_arn" {
   description = "The ARN of the IAM role for RDS monitoring"

@@ -34,13 +34,10 @@ variable "lambda_function_name" {
 }
 
 
-
-
 variable "frontend_instance_name" {
   description = "The name of the EC2 instance running the frontend application"
   type        = list(string)
 }
-
 
 
 variable "rds_instance_names" {

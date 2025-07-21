@@ -554,12 +554,14 @@ module "waf" {
 # Call the Cost Optimization module
 # This module sets up budget alerts and cost optimization strategies
 
-# module "cost_optimization" {
-#   source = "./modules/cost_optimization"
+module "cost_optimization" {
+  source = "./modules/cost_optimization"
 
-#   env = var.env
+  env = var.env
 
-# }
+}
+
+
 #security group for VPN
 resource "aws_security_group" "vpn_sg" {
   name        = "${var.env}-vpn-sg"

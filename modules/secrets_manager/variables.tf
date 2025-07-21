@@ -14,10 +14,6 @@ variable "kms_key_id" {
   description = "KMS key ID to encrypt the secret"
 }
 
-# variable "secret_value" {
-#   type        = string
-#   description = "JSON string for the secret value (e.g., {\"username\":\"admin\",\"password\":\"xyz\"})"
-# }
 
 variable "env" {
   type        = string

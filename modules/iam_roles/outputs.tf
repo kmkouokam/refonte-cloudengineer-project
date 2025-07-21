@@ -1,6 +1,4 @@
-
-
-
+#` Outputs for IAM roles and instance profiles
 
 output "rds_monitoring_role_arn" {
   value = aws_iam_role.rds_monitoring_role.arn
@@ -35,8 +33,5 @@ output "xray_instance_profile_name" {
 }
 
 
-# output "waf_logging_bucket" {
-#   value = aws_s3_bucket.waf_logging_bucket.id
-# }
 
 

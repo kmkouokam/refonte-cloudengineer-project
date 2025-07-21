@@ -4,11 +4,11 @@ variable "env" {
 }
 
 
-
 variable "instance_type" {
   description = "The instance type for the Jenkins server"
   type        = string
 }
+
 variable "key_name" {
   description = "The name of the key pair to use for SSH access to the Jenkins instance"
   type        = string
