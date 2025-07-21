@@ -84,16 +84,16 @@ resource "aws_budgets_budget" "monthly_budget" {
     values = ["Amazon Elastic Compute Cloud - Compute"]
   }
 
-  dynamic "notification" {
-    for_each = var.alert_email
-    content {
-      comparison_operator        = "GREATER_THAN"
-      notification_type          = "ACTUAL"
-      threshold                  = 79
-      threshold_type             = "PERCENTAGE"
-      subscriber_email_addresses = [notification.value]
-      subscriber_sns_topic_arns  = []
-    }
+  notification {
+    # for_each = var.alert_email
+
+    comparison_operator        = "GREATER_THAN"
+    notification_type          = "ACTUAL"
+    threshold                  = 90
+    threshold_type             = "PERCENTAGE"
+    subscriber_email_addresses = var.alert_email
+    subscriber_sns_topic_arns  = []
+
   }
   lifecycle {
     ignore_changes = [
