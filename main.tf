@@ -24,6 +24,7 @@ resource "aws_vpc" "main" {
 resource "aws_internet_gateway" "main" {
   vpc_id = aws_vpc.main.id
   tags   = merge(var.tags, { Name = "${var.env}-igw" })
+  #   depends_on = [module.bastion, module.nginx_frontend, module.jenkins, aws_nat_gateway.nat]
 }
 
 #-------------Public Subnets and Routing----------------------------------------

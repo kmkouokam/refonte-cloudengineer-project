@@ -44,8 +44,11 @@ resource "aws_wafv2_web_acl_association" "waf_to_alb" {
   web_acl_arn  = aws_wafv2_web_acl.waf-metrics.arn
 
   depends_on = [
-
   aws_wafv2_web_acl.waf-metrics]
+
+  lifecycle {
+    create_before_destroy = true
+  }
 }
 
 resource "aws_wafv2_web_acl_logging_configuration" "waf_logging" {
